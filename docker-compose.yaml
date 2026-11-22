@@ -1,0 +1,32 @@
+services:
+  app:
+    build:
+      dockerfile: Dockerfile
+    container_name: app
+    ports:
+      - "${PORT:-8080}:8000"
+    environment:
+      GREETING: "${GREETING:-Hello, bro!}"
+      STORAGE: "redis"
+      REDIS_URL: "redis://redis:6379/0"
+    volumes:
+      - volume:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:8000/readyz"]
+    read_only: true
+    mem_limit: 256m
+    cpus: 1.0
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping"]
+
+
+
+volumes:
+    volume:
+    redis_data:
